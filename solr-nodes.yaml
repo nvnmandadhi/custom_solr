@@ -1,0 +1,111 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.18.0 ()
+  creationTimestamp: null
+  labels:
+    service: solr1
+    app: solr
+    node: solr1
+  name: solr1
+spec:
+  replicas: 4
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: solr1
+    spec:
+      containers:
+      - env:
+        - name: ZK_HOST
+          value: zoo1:2181,zoo2:2181,zoo3:2181
+        image: solr:8
+        name: solr1
+        ports:
+        - containerPort: 8983
+        resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.18.0 ()
+  creationTimestamp: null
+  labels:
+    service: solr1
+    app: solr
+    node: solr1
+  name: solr1
+spec:
+  type: NodePort
+  ports:
+  - name: "8981"
+    port: 8981
+    targetPort: 8983
+  selector:
+    service: solr1
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.18.0 ()
+  creationTimestamp: null
+  labels:
+    service: solr2
+    app: solr
+    node: solr2
+  name: solr2
+spec:
+  replicas: 4
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        service: solr2
+    spec:
+      containers:
+      - env:
+        - name: ZK_HOST
+          value: zoo1:2181,zoo2:2181,zoo3:2181
+        image: solr:8
+        name: solr2
+        ports:
+        - containerPort: 8983
+        resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.18.0 ()
+  creationTimestamp: null
+  labels:
+    service: solr2
+    app: solr
+    node: solr2
+  name: solr2
+spec:
+  type: NodePort
+  ports:
+  - name: "8981"
+    port: 8981
+    targetPort: 8983
+  selector:
+    service: solr2
+status:
+  loadBalancer: {}
