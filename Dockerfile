@@ -7,3 +7,4 @@ COPY docker-entrypoint.sh /
 
 RUN cd /
 RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
