@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -8,6 +8,10 @@ metadata:
   name: zoo1
 spec:
   replicas: 1
+  selector:
+    - matchLabels:
+        app: zoo
+        node: zoo1
   strategy: {}
   template:
     metadata:
@@ -54,7 +58,7 @@ spec:
 status:
   loadBalancer: {}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -64,6 +68,10 @@ metadata:
   name: zoo2
 spec:
   replicas: 1
+  selector:
+    - matchLabels:
+        app: zoo
+        node: zoo2
   strategy: {}
   template:
     metadata:
@@ -110,7 +118,7 @@ spec:
 status:
   loadBalancer: {}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -120,6 +128,10 @@ metadata:
   name: zoo3
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: zoo
+      node: zoo3
   strategy: {}
   template:
     metadata:
@@ -166,7 +178,7 @@ spec:
 status:
   loadBalancer: {}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -176,6 +188,10 @@ metadata:
   name: solr1
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: solr
+      node: solr1
   strategy: {}
   template:
     metadata:
@@ -191,6 +207,7 @@ spec:
         ports:
         - containerPort: 8983
         resources: {}
+      hostname: solr1
       restartPolicy: Always
 status: {}
 ---
@@ -205,15 +222,15 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - name: "8981"
-    port: 8981
+  - name: "8983"
+    port: 8983
     targetPort: 8983
   selector:
     service: solr1
 status:
   loadBalancer: {}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -223,6 +240,10 @@ metadata:
   name: solr2
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: solr
+      node: solr2
   strategy: {}
   template:
     metadata:
@@ -238,6 +259,7 @@ spec:
         ports:
         - containerPort: 8983
         resources: {}
+      hostname: solr2
       restartPolicy: Always
 status: {}
 ---
@@ -252,8 +274,8 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - name: "8981"
-    port: 8981
+  - name: "8983"
+    port: 8983
     targetPort: 8983
   selector:
     service: solr2
