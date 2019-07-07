@@ -1,10 +1,6 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
   labels:
     service: zoo1
     app: zoo
@@ -24,7 +20,7 @@ spec:
         - name: ZOO_MY_ID
           value: "1"
         - name: ZOO_SERVERS
-          value: server.1=0.0.0.0:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
+          value: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
         image: zookeeper
         name: zoo1
         ports:
@@ -40,10 +36,6 @@ status: {}
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
   labels:
     service: zoo1
     app: zoo
@@ -68,10 +60,6 @@ status:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
   labels:
     service: zoo2
     app: zoo
@@ -82,7 +70,6 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         service: zoo2
     spec:
@@ -91,11 +78,11 @@ spec:
         - name: ZOO_MY_ID
           value: "2"
         - name: ZOO_SERVERS
-          value: server.1=zoo1:2888:3888;2181 server.2=0:0:0:0:2888:3888;2181 server.3=zoo3:2888:3888;2181
-        image: naveenm1786/zoo
+          value: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
+        image: zookeeper
         name: zoo2
         ports:
-        - containerPort: 2181
+        - containerPort: 2182
         - containerPort: 2888
         - containerPort: 3888
         resources: {}
@@ -107,10 +94,6 @@ status: {}
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
   labels:
     service: zoo2
     app: zoo
@@ -120,7 +103,7 @@ spec:
   ports:
   - name: "2181"
     port: 2181
-    targetPort: 2181
+    targetPort: 2182
   - name: "2888"
     port: 2888
     targetPort: 2888
@@ -135,10 +118,6 @@ status:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
   labels:
     service: zoo3
     app: zoo
@@ -149,7 +128,6 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         service: zoo3
     spec:
@@ -158,11 +136,11 @@ spec:
         - name: ZOO_MY_ID
           value: "3"
         - name: ZOO_SERVERS
-          value: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=0:0:0:0:2888:3888;2181
-        image: naveenm1786/zoo
+          value: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
+        image: zookeeper
         name: zoo3
         ports:
-        - containerPort: 2181
+        - containerPort: 2183
         - containerPort: 2888
         - containerPort: 3888
         resources: {}
@@ -174,10 +152,6 @@ status: {}
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
   labels:
     service: zoo3
     app: zoo
@@ -187,7 +161,7 @@ spec:
   ports:
   - name: "2181"
     port: 2181
-    targetPort: 2181
+    targetPort: 2183
   - name: "2888"
     port: 2888
     targetPort: 2888
