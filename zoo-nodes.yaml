@@ -20,9 +20,7 @@ spec:
         service: zoo1
     spec:
       containers:
-      - command:
-        - /docker-entrypoint.sh
-        env:
+      - env:
         - name: ZOO_MY_ID
           value: "1"
         - name: ZOO_SERVERS
@@ -89,9 +87,7 @@ spec:
         service: zoo2
     spec:
       containers:
-      - command:
-        - /docker-entrypoint.sh
-        env:
+      - env:
         - name: ZOO_MY_ID
           value: "2"
         - name: ZOO_SERVERS
@@ -158,9 +154,7 @@ spec:
         service: zoo3
     spec:
       containers:
-      - command:
-        - /docker-entrypoint.sh
-        env:
+      - env:
         - name: ZOO_MY_ID
           value: "3"
         - name: ZOO_SERVERS
