@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: solr1
+    app: solr
+    node: solr1
+  name: solr1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: solr
+      node: solr1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        service: solr1
+    spec:
+      containers:
+      - env:
+        - name: ZK_HOST
+          value: zoo1:2181,zoo2:2181,zoo3:2181
+        image: solr:8
+        name: solr1
+        ports:
+        - containerPort: 8983
+        resources: {}
+      hostname: solr1
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: solr1
+    app: solr
+    node: solr1
+  name: solr1
+spec:
+  type: NodePort
+  ports:
+  - name: "8983"
+    port: 8983
+    targetPort: 8983
+  selector:
+    service: solr1
+status:
+  loadBalancer: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: solr2
+    app: solr
+    node: solr2
+  name: solr2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: solr
+      node: solr2
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        service: solr2
+    spec:
+      containers:
+      - env:
+        - name: ZK_HOST
+          value: zoo1:2181,zoo2:2181,zoo3:2181
+        image: solr:8
+        name: solr2
+        ports:
+        - containerPort: 8983
+        resources: {}
+      hostname: solr2
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: solr2
+    app: solr
+    node: solr2
+  name: solr2
+spec:
+  type: NodePort
+  ports:
+  - name: "8983"
+    port: 8983
+    targetPort: 8983
+  selector:
+    service: solr2
+status:
+  loadBalancer: {}
