@@ -1,3 +1,81 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: zoo1
+    app: zoo
+    node: zoo1
+  name: zoo1
+spec:
+  ports:
+  - name: "2181"
+    port: 2181
+    targetPort: 2181
+  - name: "2888"
+    port: 2888
+    targetPort: 2888
+  - name: "3888"
+    port: 3888
+    targetPort: 3888
+  selector:
+    service: zoo1
+    app: zoo
+    node: zoo1
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: zoo2
+    app: zoo
+    node: zoo2
+  name: zoo2
+spec:
+  ports:
+  - name: "2181"
+    port: 2182
+    targetPort: 2181
+  - name: "2888"
+    port: 2888
+    targetPort: 2888
+  - name: "3888"
+    port: 3888
+    targetPort: 3888
+  selector:
+    service: zoo2
+    app: zoo
+    node: zoo2
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: zoo3
+    app: zoo
+    node: zoo3
+  name: zoo3
+spec:
+  ports:
+  - name: "2181"
+    port: 2183
+    targetPort: 2181
+  - name: "2888"
+    port: 2888
+    targetPort: 2888
+  - name: "3888"
+    port: 3888
+    targetPort: 3888
+  selector:
+    service: zoo3
+    app: zoo
+    node: zoo3
+status:
+  loadBalancer: {}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -9,19 +87,24 @@ metadata:
 spec:
   replicas: 1
   selector:
-    - matchLabels:
-        app: zoo
-        node: zoo1
+    matchLabels:
+      app: zoo
+      node: zoo1
+      service: zoo1
   strategy: {}
   template:
     metadata:
       labels:
         service: zoo1
+        node: zoo1
+        app: zoo
     spec:
       containers:
       - env:
         - name: ZOO_MY_ID
           value: "1"
+        - name: ZOO_SERVERS
+          value: "server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888"
         image: naveenm1786/zoo
         name: zoo1
         ports:
@@ -34,30 +117,6 @@ spec:
       restartPolicy: Always
 status: {}
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    service: zoo1
-    app: zoo
-    node: zoo1
-  name: zoo1
-spec:
-  ports:
-  - name: "2181"
-    port: 2181
-    targetPort: 2181
-  - name: "2888"
-    port: 2888
-    targetPort: 2888
-  - name: "3888"
-    port: 3888
-    targetPort: 3888
-  selector:
-    service: zoo1
-status:
-  loadBalancer: {}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -69,19 +128,24 @@ metadata:
 spec:
   replicas: 1
   selector:
-    - matchLabels:
-        app: zoo
-        node: zoo2
+    matchLabels:
+      service: zoo2
+      app: zoo
+      node: zoo2
   strategy: {}
   template:
     metadata:
       labels:
         service: zoo2
+        app: zoo
+        node: zoo2
     spec:
       containers:
       - env:
         - name: ZOO_MY_ID
           value: "2"
+        - name: ZOO_SERVERS
+          value: "server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888"
         image: naveenm1786/zoo
         name: zoo2
         ports:
@@ -93,30 +157,6 @@ spec:
       hostname: zoo2
       restartPolicy: Always
 status: {}
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    service: zoo2
-    app: zoo
-    node: zoo2
-  name: zoo2
-spec:
-  ports:
-  - name: "2181"
-    port: 2181
-    targetPort: 2181
-  - name: "2888"
-    port: 2888
-    targetPort: 2888
-  - name: "3888"
-    port: 3888
-    targetPort: 3888
-  selector:
-    service: zoo2
-status:
-  loadBalancer: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -130,6 +170,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      service: zoo3
       app: zoo
       node: zoo3
   strategy: {}
@@ -137,11 +178,15 @@ spec:
     metadata:
       labels:
         service: zoo3
+        app: zoo
+        node: zoo3
     spec:
       containers:
       - env:
         - name: ZOO_MY_ID
           value: "3"
+        - name: ZOO_SERVERS
+          value: "server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888"
         image: naveenm1786/zoo
         name: zoo3
         ports:
@@ -153,28 +198,4 @@ spec:
       hostname: zoo3
       restartPolicy: Always
 status: {}
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    service: zoo3
-    app: zoo
-    node: zoo3
-  name: zoo3
-spec:
-  ports:
-  - name: "2181"
-    port: 2181
-    targetPort: 2181
-  - name: "2888"
-    port: 2888
-    targetPort: 2888
-  - name: "3888"
-    port: 3888
-    targetPort: 3888
-  selector:
-    service: zoo3
-status:
-  loadBalancer: {}
----
+

@@ -6,7 +6,7 @@ metadata:
     app: solr
     node: pv
 spec:
-  storageClassName: manual
+  storageClassName: standard
   capacity:
     storage: 10Gi
   accessModes:
@@ -22,10 +22,11 @@ metadata:
     app: zoo
     node: pv
 spec:
-  storageClassName: manual
+  storageClassName: standard
   capacity:
-    storage: 1Gi
+    storage: 3Gi
   accessModes:
     - ReadWriteMany
   hostPath:
     path: "/var/zk/data"
+

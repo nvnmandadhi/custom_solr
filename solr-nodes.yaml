@@ -10,6 +10,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      service: solr1
       app: solr
       node: solr1
   strategy: {}
@@ -17,11 +18,13 @@ spec:
     metadata:
       labels:
         service: solr1
+        app: solr
+        node: solr1
     spec:
       containers:
       - env:
         - name: ZK_HOST
-          value: zoo1:2181,zoo2:2181,zoo3:2181
+          value: zoo1:2181,zoo2:2182,zoo3:2183
         image: solr:8
         name: solr1
         ports:
@@ -62,6 +65,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      service: solr2
       app: solr
       node: solr2
   strategy: {}
@@ -69,11 +73,13 @@ spec:
     metadata:
       labels:
         service: solr2
+        app: solr
+        node: solr2
     spec:
       containers:
       - env:
         - name: ZK_HOST
-          value: zoo1:2181,zoo2:2181,zoo3:2181
+          value: zoo1:2181,zoo2:2182,zoo3:2183
         image: solr:8
         name: solr2
         ports:
