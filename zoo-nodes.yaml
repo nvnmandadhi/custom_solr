@@ -2,25 +2,6 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    service: zoo-lb
-    app: zoo
-    node: zoo-lb
-  name: zoo-lb
-spec:
-  type: LoadBalancer
-  ports:
-  - name: "2181"
-    port: 2181
-    targetPort: 2181
-  selector:
-    app: zoo
-status:
-  loadBalancer: {}
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
     service: zoo1
     app: zoo
     node: zoo1
@@ -96,125 +77,170 @@ status:
   loadBalancer: {}
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
+  name: zk1-ss
   labels:
-    service: zoo1
     app: zoo
     node: zoo1
-  name: zoo1
+    service: zoo1
 spec:
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
   replicas: 1
   selector:
     matchLabels:
       app: zoo
       node: zoo1
       service: zoo1
-  strategy: {}
+  serviceName: zoo1
   template:
     metadata:
       labels:
+        app: zoo
         service: zoo1
         node: zoo1
-        app: zoo
     spec:
       containers:
-      - env:
-        - name: ZOO_MY_ID
-          value: "1"
-        - name: ZOO_SERVERS
-          value: "server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888"
-        image: naveenm1786/zoo
-        name: zoo1
-        ports:
-        - containerPort: 2181
-        - containerPort: 2888
-        - containerPort: 3888
-        resources: {}
-        tty: true
-      hostname: zoo1
-      restartPolicy: Always
-status: {}
+        - name: zoo1
+          image: naveenm1786/zoo
+          env:
+          - name: ZOO_SERVERS
+            value: "server.1=zk1-ss-0.zoo1.default.svc.cluster.local:2888:3888 server.2=zk2-ss-0.zoo2.default.svc.cluster.local:2888:3888 server.3=zk3-ss-0.zoo3.default.svc.cluster.local:2888:3888"
+          - name: ZOO_MY_ID
+            value: "1"
+          ports:
+            - containerPort: 2181
+            - containerPort: 2888
+            - containerPort: 3888
+          volumeMounts:
+            - mountPath: /data
+              name: vct-zk-1
+  volumeClaimTemplates:
+    - metadata:
+        name: vct-zk-1
+        labels:
+          app: zoo
+          node: zoo1
+          service: zoo1
+      spec:
+        storageClassName: standard
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
+  name: zk2-ss
   labels:
-    service: zoo2
     app: zoo
     node: zoo2
-  name: zoo2
+    service: zoo2
 spec:
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
   replicas: 1
   selector:
     matchLabels:
-      service: zoo2
       app: zoo
       node: zoo2
-  strategy: {}
+      service: zoo2
+  serviceName: zoo2
   template:
     metadata:
       labels:
-        service: zoo2
         app: zoo
+        service: zoo2
         node: zoo2
     spec:
       containers:
-      - env:
-        - name: ZOO_MY_ID
-          value: "2"
-        - name: ZOO_SERVERS
-          value: "server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888"
-        image: naveenm1786/zoo
-        name: zoo2
-        ports:
-        - containerPort: 2181
-        - containerPort: 2888
-        - containerPort: 3888
-        resources: {}
-        tty: true
-      hostname: zoo2
-      restartPolicy: Always
-status: {}
+        - name: zoo2
+          image: naveenm1786/zoo
+          env:
+          - name: ZOO_SERVERS
+            value: "server.1=zk1-ss-0.zoo1.default.svc.cluster.local:2888:3888 server.2=zk2-ss-0.zoo2.default.svc.cluster.local:2888:3888 server.3=zk3-ss-0.zoo3.default.svc.cluster.local:2888:3888"
+          - name: ZOO_MY_ID
+            value: "2"
+          ports:
+            - containerPort: 2181
+            - containerPort: 2888
+            - containerPort: 3888
+          volumeMounts:
+            - mountPath: /data
+              name: vct-zk-2
+  volumeClaimTemplates:
+    - metadata:
+        name: vct-zk-2
+        labels:
+          app: zoo
+          node: zoo2
+          service: zoo2
+      spec:
+        storageClassName: standard
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
+  name: zk3-ss
   labels:
-    service: zoo3
     app: zoo
     node: zoo3
-  name: zoo3
+    service: zoo3
 spec:
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
   replicas: 1
   selector:
     matchLabels:
-      service: zoo3
       app: zoo
       node: zoo3
-  strategy: {}
+      service: zoo3
+  serviceName: zoo3
   template:
     metadata:
       labels:
-        service: zoo3
         app: zoo
+        service: zoo3
         node: zoo3
     spec:
       containers:
-      - env:
-        - name: ZOO_MY_ID
-          value: "3"
-        - name: ZOO_SERVERS
-          value: "server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888"
-        image: naveenm1786/zoo
-        name: zoo3
-        ports:
-        - containerPort: 2181
-        - containerPort: 2888
-        - containerPort: 3888
-        resources: {}
-        tty: true
-      hostname: zoo3
-      restartPolicy: Always
-status: {}
+        - name: zoo3
+          image: naveenm1786/zoo
+          env:
+          - name: ZOO_SERVERS
+            value: "server.1=zk1-ss-0.zoo1.default.svc.cluster.local:2888:3888 server.2=zk2-ss-0.zoo2.default.svc.cluster.local:2888:3888 server.3=zk3-ss-0.zoo3.default.svc.cluster.local:2888:3888"
+          - name: ZOO_MY_ID
+            value: "3"
+          ports:
+            - containerPort: 2181
+            - containerPort: 2888
+            - containerPort: 3888
+          volumeMounts:
+            - mountPath: /data
+              name: vct-zk-3
+  volumeClaimTemplates:
+    - metadata:
+        name: vct-zk-3
+        labels:
+          app: zoo
+          node: zoo3
+          service: zoo3
+      spec:
+        storageClassName: standard
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
 

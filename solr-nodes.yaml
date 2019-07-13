@@ -52,73 +52,105 @@ status:
   loadBalancer: {}
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
+  name: solr1-ss
   labels:
-    service: solr1
     app: solr
     node: solr1
-  name: solr1
+    service: solr1
 spec:
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
   replicas: 1
   selector:
     matchLabels:
-      service: solr1
       app: solr
       node: solr1
-  strategy: {}
+      service: solr1
+  serviceName: solr1
   template:
     metadata:
       labels:
-        service: solr1
         app: solr
+        service: solr1
         node: solr1
     spec:
       containers:
-      - env:
-        - name: ZK_HOST
-          value: zoo1:2181,zoo2:2182,zoo3:2183
-        image: solr:8
-        name: solr1
-        ports:
-        - containerPort: 8983
-        resources: {}
-      hostname: solr1
-      restartPolicy: Always
-status: {}
+        - name: solr1
+          image: solr:8
+          env:
+          - name: ZK_HOST
+            value: zoo1:2181,zoo2:2182,zoo3:2183
+          ports:
+            - containerPort: 8983
+          volumeMounts:
+            - mountPath: /var/solr/data
+              name: vct-solr-1
+  volumeClaimTemplates:
+    - metadata:
+        name: vct-solr-1
+        labels:
+          app: solr
+          node: solr1
+          service: solr1
+      spec:
+        storageClassName: standard
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
+  name: solr2-ss
   labels:
-    service: solr2
     app: solr
     node: solr2
-  name: solr2
+    service: solr2
 spec:
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
   replicas: 1
   selector:
     matchLabels:
-      service: solr2
       app: solr
       node: solr2
-  strategy: {}
+      service: solr2
+  serviceName: solr2
   template:
     metadata:
       labels:
-        service: solr2
         app: solr
+        service: solr2
         node: solr2
     spec:
       containers:
-      - env:
-        - name: ZK_HOST
-          value: zoo1:2181,zoo2:2182,zoo3:2183
-        image: solr:8
-        name: solr2
-        ports:
-        - containerPort: 8983
-        resources: {}
-      hostname: solr2
-      restartPolicy: Always
-status: {}
+        - name: solr2
+          image: solr:8
+          env:
+          - name: ZK_HOST
+            value: zoo1:2181,zoo2:2182,zoo3:2183
+          ports:
+            - containerPort: 8983
+          volumeMounts:
+            - mountPath: /var/solr/data
+              name: vct-solr-2
+  volumeClaimTemplates:
+    - metadata:
+        name: vct-solr-2
+        labels:
+          app: solr
+          node: solr2
+          service: solr2
+      spec:
+        storageClassName: standard
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
